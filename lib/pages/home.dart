@@ -1,31 +1,260 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tutorial/models/category_model.dart';
+import 'package:tutorial/models/diet_model.dart';
+import 'package:tutorial/models/popular_model.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
 
   List<CategoryModel> categories = [];
+  List<DietModel> diets = [];
+  List<PopularDietsModel> popularDiets = [];
 
   void getCategories() {
     categories = CategoryModel.getCategories();
   }
 
+  void getDiets() {
+    diets = DietModel.getDiets();
+  }
+
+  void getPopular() {
+    popularDiets = PopularDietsModel.getPopularDiets();
+  }
+
+  void getInitialInfo() {
+    getCategories();
+    getDiets();
+    getPopular();
+  }
+
   @override
   Widget build(BuildContext context) {
-    getCategories();
+    getInitialInfo();
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: appBar(),
-      body: Column(
+      body: ListView(
         children: [
           searchField(),
           const SizedBox(
             height: 40,
           ),
           categoriesSection(),
+          const SizedBox(
+            height: 40,
+          ),
+          dietsSection(),
+          const SizedBox(
+            height: 40,
+          ),
+          popularDietsSection()
         ],
       ),
+    );
+  }
+
+  Column popularDietsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Text(
+            "Popular",
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        ListView.separated(
+          shrinkWrap: true,
+          padding: const EdgeInsets.only(
+            left: 20,
+            right: 20,
+          ),
+          itemBuilder: (context, index) {
+            return Container(
+              height: 115,
+              decoration: BoxDecoration(
+                color: popularDiets[index].boxIsSelected
+                    ? Colors.white
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: popularDiets[index].boxIsSelected
+                    ? [
+                        BoxShadow(
+                          color: Colors.black
+                              .withOpacity(0.07),
+                          offset: const Offset(0, 10),
+                          blurRadius: 40,
+                          spreadRadius: 0,
+                        )
+                      ]
+                    : [],
+              ),
+              child: Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Placeholder(
+                    fallbackWidth: 80,
+                    fallbackHeight: 80,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                    ),
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      mainAxisAlignment:
+                          MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          popularDiets[index].name,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                              fontSize: 16),
+                        ),
+                        Text(
+                          '${popularDiets[index].level} | ${popularDiets[index].duration} | ${popularDiets[index].calorie}',
+                          style: const TextStyle(
+                              color: Color(0xff7B6F72),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {},
+                    child: const Placeholder(
+                      fallbackWidth: 30,
+                      fallbackHeight: 30,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+          separatorBuilder: (context, index) =>
+              const SizedBox(
+            height: 15,
+          ),
+          itemCount: popularDiets.length,
+        )
+      ],
+    );
+  }
+
+  Column dietsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Text(
+            "Recommendation for diets",
+            textAlign: TextAlign.start,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+        SizedBox(
+          height: 240,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.only(
+              left: 20,
+              right: 20,
+            ),
+            itemBuilder: (context, index) {
+              return Container(
+                width: 210,
+                decoration: BoxDecoration(
+                  color: diets[index]
+                      .boxColor
+                      .withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceEvenly,
+                    children: [
+                      const Placeholder(
+                        fallbackHeight: 80,
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                            diets[index].name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                                fontSize: 16),
+                          ),
+                          Text(
+                            '${diets[index].level} | ${diets[index].duration} | ${diets[index].calorie}',
+                            style: const TextStyle(
+                                color: Color(0xff7B6F72),
+                                fontSize: 13,
+                                fontWeight:
+                                    FontWeight.w400),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        height: 45,
+                        width: 130,
+                        decoration: BoxDecoration(
+                            gradient:
+                                LinearGradient(colors: [
+                          diets[index].viewIsSelected
+                              ? const Color(0xff9DCEFF)
+                              : Colors.transparent,
+                          diets[index].viewIsSelected
+                              ? const Color(0xff92A3FD)
+                              : Colors.transparent
+                        ])),
+                        child: Center(
+                            child: Text(
+                          "View",
+                          style: TextStyle(
+                              color: diets[index]
+                                      .viewIsSelected
+                                  ? Colors.white
+                                  : const Color(0xffC58BF2),
+                              fontWeight: FontWeight.w500,
+                              fontSize: 14),
+                        )),
+                      )
+                    ]),
+              );
+            },
+            separatorBuilder: (context, index) =>
+                const SizedBox(
+              width: 25,
+            ),
+            itemCount: diets.length,
+          ),
+        ),
+      ],
     );
   }
 
@@ -33,12 +262,15 @@ class HomePage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Category",
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+        const Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Text(
+            "Category",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         const SizedBox(
